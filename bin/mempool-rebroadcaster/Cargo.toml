@@ -11,9 +11,9 @@ path = "src/main.rs"
 workspace = true
 
 [dependencies]
-clap = { workspace = true }
 dotenvy.workspace = true
-mempool-rebroadcaster = { workspace = true }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
+clap = { workspace = true }
 tokio = { workspace = true }
+tracing = { workspace = true }
+base-cli-utils.workspace = true
+mempool-rebroadcaster = { workspace = true }

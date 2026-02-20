@@ -3206,12 +3206,12 @@ dependencies = [
 name = "based-bin"
 version = "0.0.0"
 dependencies = [
+ "base-cli-utils",
  "based",
  "cadence",
  "clap",
  "tokio",
  "tracing",
- "tracing-subscriber 0.3.22",
 ]
 
 [[package]]
@@ -8450,12 +8450,12 @@ dependencies = [
 name = "mempool-rebroadcaster-bin"
 version = "0.0.0"
 dependencies = [
+ "base-cli-utils",
  "clap",
  "dotenvy",
  "mempool-rebroadcaster",
  "tokio",
  "tracing",
- "tracing-subscriber 0.3.22",
 ]
 
 [[package]]
@@ -17268,6 +17268,7 @@ name = "websocket-proxy-bin"
 version = "0.0.0"
 dependencies = [
  "axum 0.8.8",
+ "base-cli-utils",
  "brotli",
  "clap",
  "dotenvy",
@@ -17277,7 +17278,6 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
- "tracing-subscriber 0.3.22",
  "websocket-proxy",
 ]
 

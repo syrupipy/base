@@ -22,8 +22,8 @@ dotenvy.workspace = true
 tracing.workspace = true
 tokio-util.workspace = true
 websocket-proxy.workspace = true
+base-cli-utils.workspace = true
 tokio = { workspace = true, features = ["full"] }
 axum = { workspace = true, features = ["ws"] }
 clap = { workspace = true, features = ["derive", "env"] }
-tracing-subscriber = { workspace = true, features = ["env-filter", "json"] }
 metrics-exporter-prometheus = { workspace = true, features = ["http-listener"] }

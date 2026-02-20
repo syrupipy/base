@@ -2,13 +2,13 @@
 
 use std::net::UdpSocket;
 
+use base_cli_utils::{LogConfig, LogFormat, LogLevel, StdoutLogConfig};
 use based::{
     BlockProductionHealthChecker, HealthcheckConfig, HealthcheckMetrics, Node,
     alloy_client::AlloyEthClient,
 };
 use cadence::{StatsdClient, UdpMetricSink};
 use clap::Parser;
-use tracing::Level;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Blockbuilding sidecar healthcheck service")]
@@ -30,12 +30,12 @@ struct Args {
     unhealthy_node_threshold_ms: u64,
 
     /// Log level
-    #[arg(long, env, default_value_t = Level::INFO)]
-    log_level: Level,
+    #[arg(long, env, default_value = "info")]
+    log_level: LogLevel,
 
-    /// Log format (text|json)
+    /// Log format
     #[arg(long, env, default_value = "json")]
-    log_format: String,
+    log_format: LogFormat,
 
     /// Treat node as a new instance on startup (suppresses initial errors until healthy)
     #[arg(long, env, default_value_t = true)]
@@ -46,12 +46,13 @@ struct Args {
 async fn main() {
     let args = Args::parse();
 
-    // Initialize logging
-    if args.log_format.to_lowercase() == "json" {
-        let _ = tracing_subscriber::fmt().json().with_max_level(args.log_level).try_init();
-    } else {
-        let _ = tracing_subscriber::fmt().with_max_level(args.log_level).try_init();
+    LogConfig {
+        global_level: args.log_level.into(),
+        stdout_logs: Some(StdoutLogConfig { format: args.log_format }),
+        file_logs: None,
     }
+    .init_tracing_subscriber()
+    .expect("Failed to initialize tracing");
 
     // Initialize StatsD client (sends to Datadog agent)
     // Use DD_AGENT_HOST if set (Kubernetes), otherwise localhost

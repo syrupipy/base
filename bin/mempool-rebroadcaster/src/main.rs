@@ -1,10 +1,10 @@
 //! Mempool rebroadcaster binary entry point.
 
+use base_cli_utils::{LogConfig, LogFormat, LogLevel, StdoutLogConfig};
 use clap::Parser;
 use dotenvy::dotenv;
 use mempool_rebroadcaster::Rebroadcaster;
-use tracing::{Level, error, info};
-use tracing_subscriber::EnvFilter;
+use tracing::{error, info};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "A mempool rebroadcaster service")]
@@ -16,11 +16,11 @@ struct Args {
     reth_mempool_endpoint: String,
 
     #[arg(long, env, default_value = "info")]
-    log_level: Level,
+    log_level: LogLevel,
 
-    /// Format for logs, can be json or text
+    /// Log format
     #[arg(long, env, default_value = "text")]
-    log_format: String,
+    log_format: LogFormat,
 }
 
 #[tokio::main]
@@ -28,21 +28,13 @@ async fn main() {
     dotenv().ok();
     let args = Args::parse();
 
-    let log_format = args.log_format.to_lowercase();
-    let log_level = args.log_level.to_string();
-
-    if log_format == "json" {
-        tracing_subscriber::fmt()
-            .json()
-            .with_env_filter(EnvFilter::new(log_level))
-            .with_ansi(false)
-            .init();
-    } else {
-        tracing_subscriber::fmt()
-            .with_env_filter(EnvFilter::new(log_level))
-            .with_ansi(false)
-            .init();
+    LogConfig {
+        global_level: args.log_level.into(),
+        stdout_logs: Some(StdoutLogConfig { format: args.log_format }),
+        file_logs: None,
     }
+    .init_tracing_subscriber()
+    .expect("Failed to initialize tracing");
 
     let rebroadcaster = Rebroadcaster::new(args.geth_mempool_endpoint, args.reth_mempool_endpoint);
     let result = rebroadcaster.run().await;
